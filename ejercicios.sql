@@ -151,3 +151,31 @@ END IF;
 SELECT * FROM productos;
 
 
+
+-- Solucion al problema de sintaxis.
+
+BEGIN;
+
+DO $$
+DECLARE
+    total_precio NUMERIC;
+BEGIN
+    -- Actualizar precios
+    UPDATE productos SET precio = precio * 1.10 WHERE nombre = 'Laptop';
+    UPDATE productos SET precio = precio * 1.10 WHERE nombre = 'Mouse';
+    UPDATE productos SET precio = precio * 1.10 WHERE nombre = 'Teclado';
+
+    -- Calcular el total del precio
+    SELECT SUM(precio) INTO total_precio FROM productos WHERE nombre IN ('Laptop', 'Mouse', 'Teclado');
+
+    -- Verificar el total y mostrar un mensaje
+    IF total_precio > 2000.00 THEN
+        RAISE NOTICE 'Total precio excede el límite. Debería realizarse un ROLLBACK.';
+        PERFORM pg_sleep(0); -- Solo para evitar errores en la sintaxis
+    ELSE
+        RAISE NOTICE 'Total precio es aceptable. Se debería realizar un COMMIT.';
+    END IF;
+END $$;
+
+-- Realizar COMMIT o ROLLBACK según el resultado del bloque anterior
+COMMIT;
