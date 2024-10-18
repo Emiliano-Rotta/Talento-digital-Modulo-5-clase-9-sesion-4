@@ -83,36 +83,62 @@ ROLLBACK;
 -- Supongamos que estás gestionando una tienda y necesitas agregar nuevos productos a la base de datos. Debes insertar tres productos en una única transacción y confirmar los cambios solo si todas las inserciones son exitosas.
 
 -- Inicia una transacción con BEGIN.
+BEGIN;
+
 -- Inserta tres nuevos productos con sus respectivos precios.
+INSERT INTO productos (nombre, precio) VALUES ('Impresora', 150.00);
+INSERT INTO productos (nombre, precio) VALUES ('Escáner', 200.00);
+INSERT INTO productos (nombre, precio) VALUES ('Tablet', 300.00);
+
 -- Confirma la transacción con COMMIT.
+COMMIT;
 
 -- Verifica que los productos han sido agregados correctamente.
+SELECT * FROM productos;
 
+
+----------------------------------------
 
 -- Ejercicio 2: Simular un Error en la Inserción y Revertir con ROLLBACK
 
 -- Continuando con la tienda, esta vez debes insertar varios productos en la base de datos, pero simularás un error en uno de ellos para utilizar ROLLBACK y revertir toda la transacción.
 
 -- Inicia una transacción con BEGIN.
+BEGIN;
+
 -- Inserta dos productos válidos.
+INSERT INTO productos (nombre, precio) VALUES ('Proyector', 500.00);
+INSERT INTO productos (nombre, precio) VALUES ('Parlantes', 100.00);
+
 -- Inserta un tercer producto con un nombre nulo, lo cual provocará un error.
+INSERT INTO productos (nombre, precio) VALUES (NULL, 150.00);
 
 -- Utiliza ROLLBACK para deshacer toda la transacción.
--- Verifica que no se han insertado productos nuevos.
+ROLLBACK;
 
+-- Verifica que no se han insertado productos nuevos.
+SELECT * FROM productos;
+
+---------------------
+--Presenta un pequeño error de sintaxis
 
 -- Ejercicio 3: Actualizar Registros y Revertir Cambios Según Condición
 
 -- En este ejercicio, actualizarás los precios de algunos productos en la base de datos. Si la suma de los precios actualizados supera un determinado monto, deberás utilizar ROLLBACK para deshacer los cambios. De lo contrario, confirma la transacción con COMMIT.
 
 -- Inicia una transacción con BEGIN.
+BEGIN;
+
 -- Actualiza los precios de al menos tres productos incrementando su valor en un 10%.
+UPDATE productos SET precio = precio * 1.10 WHERE nombre = 'Laptop';
+UPDATE productos SET precio = precio * 1.10 WHERE nombre = 'Mouse';
+UPDATE productos SET precio = precio * 1.10 WHERE nombre = 'Teclado';
+
 -- Calcula la suma de los precios actualizados.
+SELECT SUM(precio) INTO total_precio FROM productos WHERE nombre IN ('Laptop', 'Mouse', 'Teclado');
+
 -- Si la suma supera $2,000, realiza un ROLLBACK para revertir la transacción.
 -- Si la suma es menor o igual a $2,000, utiliza COMMIT para confirmar los cambios.
--- Verifica el estado de los productos.
-
-
 IF total_precio > 2000 THEN
     -- Si la suma es mayor a $2000, revertir los cambios
     ROLLBACK;
@@ -120,4 +146,8 @@ ELSE
     -- Si la suma es menor o igual a $2000, confirmar los cambios
     COMMIT;
 END IF;
+
+-- Verifica el estado de los productos.
+SELECT * FROM productos;
+
 
